@@ -54,5 +54,7 @@ private:
 
     //booleano para controlar la simulación
     bool secuencia=false;
+    char cambio;
+    int control;
 };
 #endif // MAINWINDOW_H

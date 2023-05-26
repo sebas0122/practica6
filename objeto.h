@@ -1,26 +1,32 @@
 #ifndef OBJETO_H
 #define OBJETO_H
 
-#define EX 60
-#define EY 120
+#define EX 30
+#define EY 30
 
 #define G 1
 #define DT 1
 #include <QGraphicsItem>
 #include <QPainter>
 #include <cmath>
+#include <fstream>
+#include <iostream>
+using namespace std;
 
 class objeto: public QGraphicsItem
 {
 
 private:
     float x, y, vx, vy, ax, ay, radio, masa;
+    string xstring, ystring;
+    string espacios="    ";
 
 public:
     objeto();
     objeto(float _x, float _y, float _vx, float _vy, float _radio, float _masa);
     QRectF boundingRect() const;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
+    void xyenarchivo();
 
     // get
     float getX() const;

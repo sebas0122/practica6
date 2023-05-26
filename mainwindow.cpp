@@ -10,6 +10,9 @@ MainWindow::MainWindow(QWidget *parent)
     scene = new QGraphicsScene(-500, -250, 1000, 500);
     ui->graphicsView->setScene(scene);
 
+    cambio='\n';
+    control=0;
+
     connect(ui->on_lanzamiento1_btn, SIGNAL(clicked()), this, SLOT(on_lanzamiento1_btn_clicked()));
     connect(ui->on_lanzamiento2_btn, SIGNAL(clicked()), this, SLOT(on_lanzamiento2_btn_clicked()));
     connect(ui->on_finalizar_btn, SIGNAL(clicked()), this, SLOT(on_finalizar_btn_clicked()));
@@ -26,8 +29,6 @@ MainWindow::MainWindow(QWidget *parent)
     scene->addItem(l3);
     scene->addItem(l4);
 
-    secuencia = false;
-
     timer = new QTimer(this);
     connect(timer,SIGNAL(timeout()), this, SLOT(Actualizar()));
 }
@@ -35,12 +36,29 @@ MainWindow::MainWindow(QWidget *parent)
 void MainWindow::Actualizar()
 //Actualiza las velocidades y posiciones del cuerpo
 {
-    float x2s=0,y2s=0,masa2s=0,angulos=0,rs=0;
+    for (objeto* m:sistema){
+        m->xyenarchivo();
+    }
+    ofstream fout;
+    try{
+        fout.open("posiciones.txt",ios::app);
+        if(!fout.is_open()){
+            throw '2';
+        }
+    }
+    catch (char c){
+        cout<<"Error # "<<c<<": ";
+        if(c=='2'){
+            cout<<"Error al abrir el archivo para lectura.\n";
+        }
+    }
+    fout<<cambio;
+    fout.close();
+    float x2s=0,y2s=0,masa2s=0,angulos=0,rs=0,axs=0,ays=0;
     int l=0;
     for (objeto* objeto1: sistema){
 
-        for (l=0 ; l<10 ; l++)
-        {
+        //for (l=0 ; l<10 ; l++)
             for (objeto* objeto2:sistema)
             {
                 if (objeto1!=objeto2){
@@ -50,14 +68,38 @@ void MainWindow::Actualizar()
                     rs=objeto1->getr(x2s,y2s);
                     angulos=objeto1->getangulo(x2s,y2s);
                     objeto1->aceleracion(masa2s,angulos,rs);
+                    axs=objeto1->getAx();
+                    ays=objeto1->getAy();
                 }
             }
-        }
     }
     for (objeto* k:sistema){
         k->velocidades();
         k->posiciones();
         k->inicializadoraceleracion();
+        l++;
+        if (control<=1000){
+            k->xyenarchivo();
+            ofstream fout;
+            try{
+                fout.open("posiciones.txt",ios::app);
+                if(!fout.is_open()){
+                    throw '2';
+                }
+            }
+            catch (char c){
+                cout<<"Error # "<<c<<": ";
+                if(c=='2'){
+                    cout<<"Error al abrir el archivo para lectura.\n";
+                }
+            }
+            if (l==3){
+                fout<<cambio;
+                l=0;
+            }
+            fout.close();
+            control++;
+        }
     }
 }
 
